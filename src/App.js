@@ -46,6 +46,8 @@ function App() {
     }
   };
 
+  console.log('app render');
+
   return (
     <div className="App">
       <Notifications message={message} />
@@ -59,8 +61,7 @@ function App() {
           )
           : (
             <>
-              <GameSnake />
-              .
+              <GameSnake/>
             </>
           )
       }

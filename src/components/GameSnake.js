@@ -1,4 +1,10 @@
+import {useRef,useEffect } from "react";
+
+
 export const GameSnake = () => {
+    
+    let timer;
+    const canvasRef = useRef(null);
     const state_running = 1;
     const state_losing = 2;
     const hz = 70;
@@ -16,7 +22,6 @@ export const GameSnake = () => {
         'w': [0, -1],
         's': [0, 1]
     };
-
     let estados = {
         canvas: null,
         contexto: null,
@@ -26,6 +31,28 @@ export const GameSnake = () => {
         growing: 5,
         estadoJuego: state_running
     };
+    
+    useEffect(() => {
+        window.onload = function () {
+            estados.canvas = canvasRef.current;
+            estados.contexto = estados.canvas.getContext('2d');
+            console.log('me ejecute');
+            
+            
+            window.onkeydown = function (e) {
+                const direction = teclas[e.key];
+                if (direction) {
+                    const [x, y] = direction;
+                    if (-x !== estados.direccion.x && -y !== estados.direccion.y) {
+                        estados.direccion.x = x;
+                        estados.direccion.y = y;
+                    }
+                }
+            }
+            tick();
+        }()
+    },[])
+
 
 
     const randomXY = () => {
@@ -85,6 +112,7 @@ export const GameSnake = () => {
         }
     }
 
+    console.log('render');
 
     const drawPixel = (color, x, y) => {
         estados.contexto.fillStyle = color;
@@ -107,10 +135,11 @@ export const GameSnake = () => {
         const { x, y } = estados.presa;
         drawPixel('yellow', x, y);
     }
-
+    
     estados.presa = randomXY();
-
+    
     const tick = () => {
+        
         const cabeza = estados.snake[0];
         const dx = estados.direccion.x;
         const dy = estados.direccion.y;
@@ -168,31 +197,21 @@ export const GameSnake = () => {
             estados.growing -= 1;
         }
         requestAnimationFrame(draw);
-        setTimeout(tick, intervalo);
-    }
-
-
-    window.onload = function () {
-        estados.canvas = document.querySelector('canvas');
-        estados.contexto = estados.canvas.getContext('2d');
-
-
-        window.onkeydown = function (e) {
-            const direction = teclas[e.key];
-            if (direction) {
-                const [x, y] = direction;
-                if (-x !== estados.direccion.x && -y !== estados.direccion.y) {
-                    estados.direccion.x = x;
-                    estados.direccion.y = y;
-                }
-            }
+        if(timer){
+            clearInterval(timer)
+            console.log('elimine', timer);
         }
-        tick();
+        timer = setInterval(() => {
+            tick()
+        }, intervalo);
+        console.log(timer);
     }
+
+
 
     return (
         <div>
-            <canvas className="canvas mb-4" width="250px" height="250px"></canvas>
+            <canvas ref={canvasRef} className="canvas mb-4" width="250px" height="250px"></canvas>
             <div className="container-fluid bg-success">
                 <div className="row alingButtons my-4">
                     <div className="col-4"><button onClick={() => buttonW()}>W</button></div>

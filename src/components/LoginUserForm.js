@@ -2,7 +2,6 @@ import { useState } from "react";
 
 export const LoginUserForm = ({handleLoginUser}) => {
    const [userData, setUserData] = useState({username:'',password:''});
-
    const handleChangeForm = ({target}) => {
        const {name,value} = target;
        setUserData({...userData,[name]: value})
@@ -15,7 +14,7 @@ export const LoginUserForm = ({handleLoginUser}) => {
    };
 
    return(
-      <form onSubmit={handleSubmit} >
+      <form onSubmit={handleSubmit} className='d-flex flex-column flex-end align-items-end' >
             <div>username:
                 <input
                     type='text'

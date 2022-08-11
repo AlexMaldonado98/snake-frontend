@@ -5,6 +5,13 @@
   text-align: center;
 }
 
+.toggleButton{
+  background-color: red;
+  position: relative;
+  top: -50px;
+  left: 50px;
+}
+
 canvas{
   border: solid 3px white;
   margin-top: 20px;

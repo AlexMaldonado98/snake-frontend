@@ -17,7 +17,7 @@ export const CreateUserForm = ({handleAddUser}) => {
 
 
    return(
-        <form onSubmit={handleSubmit} >
+        <form onSubmit={handleSubmit} className='d-flex flex-column flex-end align-items-end'>
             <div>username:
                 <input
                     type='text'

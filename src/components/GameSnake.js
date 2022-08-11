@@ -1,7 +1,12 @@
 import {useRef,useEffect } from "react";
 
 
-export const GameSnake = () => {
+export const GameSnake = ({handleSignOut}) => {
+
+    const signOut = (event) => {
+        event.preventDefault();
+        handleSignOut();
+    };
     
     let timer;
     const canvasRef = useRef(null);
@@ -227,6 +232,9 @@ export const GameSnake = () => {
                         <button onClick={() => buttonS()}>S</button>
                     </div>
                 </div>
+            </div>
+            <div className="mt-5">
+                <button onClick={signOut} >SIGN OUT</button>
             </div>
         </div>
     );

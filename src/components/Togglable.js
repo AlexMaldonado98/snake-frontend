@@ -1,6 +1,6 @@
 import {useState} from "react";
 
-export const Togglable = ({ buttonText, children, styleButton, initialVisibility = false }, ref) => {
+export const Togglable = ({classTogabble = '',buttonText, children, styleButton, initialVisibility = false }, ref) => {
     const [visible, setVisible] = useState(initialVisibility);
 
     const hideWhenVisible = { display: visible ? 'none' : '' };
@@ -11,7 +11,7 @@ export const Togglable = ({ buttonText, children, styleButton, initialVisibility
     };
 
     return (
-        <div>
+        <div className={classTogabble}>
             <div style={hideWhenVisible}>
                 <button className="w-50" onClick={toggleVisibility}>{buttonText}</button>
             </div>

@@ -5,29 +5,42 @@ import { useEffect, useState } from 'react';
 import { CreateUserForm } from './components/CreateUserForm';
 import createUser from './services/createUser'
 import login from './services/loginUser';
+import scoreServices from './services/score'
 import { Notifications } from './components/Notifications';
 import { LoginUserForm } from './components/LoginUserForm';
 import { Togglable } from './components/Togglable';
+import jwt from 'jwt-decode';
+import { BoardScore } from './components/BoardScores';
 
 function App() {
 
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState(null);
+  const [scores, setScores] = useState([]);
 
   useEffect(() => {
-    const userCredentials = window.localStorage.getItem('loginUser');
-    if(userCredentials){
-      const user = JSON.parse(userCredentials);
-      setUser(user);
+    const util = async () => {
+      const scoresInDb = await scoreServices.getScore();
+      setScores(scoresInDb);
+      const userCredentials = window.localStorage.getItem('loginUser');
+      if (userCredentials) {
+        const user = JSON.parse(userCredentials);
+        scoreServices.setFormatToken(user.token);
+        setUser(user);
+      }
     }
-  },[])
+    util();
+  }, [])
+
   const handleLoginUser = async (user) => {
     try {
       const result = await login.loginUser(user);
+      scoreServices.setFormatToken(result.token);
       setUser(result);
-      window.localStorage.setItem('loginUser',JSON.stringify(result));
+      window.localStorage.setItem('loginUser', JSON.stringify(result));
       console.log(result);
       setMessage('login success')
+      console.log('login', scores);
       setTimeout(() => {
         setMessage(null);
       }, 3000);
@@ -38,7 +51,7 @@ function App() {
       }, 3000);
     }
   };
-  
+
   const handleAddUser = async (newUser) => {
     try {
       await createUser.createUser(newUser)
@@ -56,11 +69,29 @@ function App() {
   };
 
   const handleSignOut = () => {
-      window.localStorage.removeItem('loginUser')
-      setUser(null);
+    window.localStorage.removeItem('loginUser')
+    setUser(null);
   };
+  console.log('fuera de todo', scores);
 
-  console.log('app render');
+  const handleAddNewScore = async (score) => {
+    const scoresInDB = await scoreServices.getScore();
+    console.log('dentro', scores);
+    const { id, username } = jwt(user.token)
+    let scoreOfUser = scoresInDB.find(score => (score.user.id === id));
+
+    console.log(scoreOfUser);
+    if (scoreOfUser) {
+      if (score > scoreOfUser.score) {
+        const result = await scoreServices.putScore(scoreOfUser.id, score)
+        result.user = { id: result.user, username: username }
+        setScores(scoresInDB.map(score => score.id === result.id ? result : score));
+      }
+    } else if (scoreOfUser === undefined) {
+      const result = await scoreServices.create(score);
+      setScores(scoresInDB.concat(result));
+    }
+  };
 
   return (
     <div className="App">
@@ -77,7 +108,7 @@ function App() {
               </div>
               <div className='px-5'>
                 <p>CREATE USER</p>
-                <Togglable styleButton={'toggleButton'} buttonText={'Create Account'}className='createUserContainer' >
+                <Togglable styleButton={'toggleButton'} buttonText={'Create Account'} className='createUserContainer' >
                   <CreateUserForm handleAddUser={handleAddUser} />
                 </Togglable>
               </div>
@@ -85,7 +116,10 @@ function App() {
           )
           : (
             <>
-              <GameSnake handleSignOut={handleSignOut} />
+              <GameSnake handleSignOut={handleSignOut} handleAddNewScore={handleAddNewScore} scores={scores} />
+              <Togglable buttonText={'Scores'} classTogabble='togglable'>
+                <BoardScore scores={scores} />
+              </Togglable>
             </>
           )
       }

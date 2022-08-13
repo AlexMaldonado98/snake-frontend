@@ -1,13 +1,15 @@
-import {useRef,useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 
-export const GameSnake = ({handleSignOut}) => {
+export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
 
-    const signOut = (event) => {
-        event.preventDefault();
+    let [score, setScore] = useState(0);
+
+    const signOut = () => {
         handleSignOut();
+        clearInterval(timer + 2);
     };
-    
+
     let timer;
     const canvasRef = useRef(null);
     const state_running = 1;
@@ -34,16 +36,17 @@ export const GameSnake = ({handleSignOut}) => {
         direccion: { x: 1, y: 0 },
         presa: { x: 0, y: 0 },
         growing: 5,
+        puntaje: 0,
+        puntajeLastgame: 0,
         estadoJuego: state_running
-    };
-    
+    }
     useEffect(() => {
         window.onload = function () {
             estados.canvas = canvasRef.current;
             estados.contexto = estados.canvas.getContext('2d');
             console.log('me ejecute');
-            
-            
+
+
             window.onkeydown = function (e) {
                 const direction = teclas[e.key];
                 if (direction) {
@@ -54,9 +57,9 @@ export const GameSnake = ({handleSignOut}) => {
                     }
                 }
             }
-            tick();
+            /* tick(); */
         }()
-    },[])
+    }, [])
 
 
 
@@ -117,8 +120,6 @@ export const GameSnake = ({handleSignOut}) => {
         }
     }
 
-    console.log('render');
-
     const drawPixel = (color, x, y) => {
         estados.contexto.fillStyle = color;
         estados.contexto.fillRect(
@@ -140,11 +141,16 @@ export const GameSnake = ({handleSignOut}) => {
         const { x, y } = estados.presa;
         drawPixel('yellow', x, y);
     }
-    
+
     estados.presa = randomXY();
-    
+
+    const handleScore = (puntajeLastGame) => {
+        handleAddNewScore(puntajeLastGame);
+        setScore(0);
+        estados.puntaje = 0
+    };
+
     const tick = () => {
-        
         const cabeza = estados.snake[0];
         const dx = estados.direccion.x;
         const dy = estados.direccion.y;
@@ -178,6 +184,7 @@ export const GameSnake = ({handleSignOut}) => {
 
             }
             if (estados.snake.length === 0) {
+                handleScore(estados.puntaje);
                 estados.estadoJuego = state_running;
                 estados.snake.push(randomXY());
                 estados.presa = randomXY();
@@ -195,24 +202,24 @@ export const GameSnake = ({handleSignOut}) => {
         if (puntuo) {
             estados.growing += crecimiento_escala;
             estados.presa = randomXY();
+            setScore(prevScore => prevScore + 5);
+            estados.puntaje += 5;
         }
 
         if (estados.growing > 0) {
             estados.snake.push(tamano);
             estados.growing -= 1;
         }
+
+
         requestAnimationFrame(draw);
-        if(timer){
+        if (timer) {
             clearInterval(timer)
-            console.log('elimine', timer);
         }
         timer = setInterval(() => {
             tick()
         }, intervalo);
-        console.log(timer);
     }
-
-
 
     return (
         <div>
@@ -233,8 +240,11 @@ export const GameSnake = ({handleSignOut}) => {
                     </div>
                 </div>
             </div>
-            <div className="mt-5">
+            <div className="mt-2">
                 <button onClick={signOut} >SIGN OUT</button>
+            </div>
+            <div className="score">
+                <p>{`Score: ${score}`}</p>
             </div>
         </div>
     );

@@ -5,6 +5,10 @@
   text-align: center;
 }
 
+.success-notification{
+  left: 50%;
+  transform: translateX(-50%);
+}
 .toggleButton{
   background-color: red;
   position: relative;

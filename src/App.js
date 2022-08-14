@@ -85,6 +85,7 @@ function App() {
       }
     } else if (scoreOfUser === undefined) {
       const result = await scoreServices.create(score);
+      result.user = { id: result.user, username: username }
       setScores(scoresInDB.concat(result));
     }
   };
@@ -114,7 +115,7 @@ function App() {
             <>
               <GameSnake handleSignOut={handleSignOut} handleAddNewScore={handleAddNewScore} scores={scores} />
               <Togglable buttonText={'Scores'} classTogabble='togglable'>
-                <BoardScore scores={scores} />
+                <BoardScore scores={scores} user={user} />
               </Togglable>
             </>
           )

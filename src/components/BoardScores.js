@@ -1,4 +1,5 @@
-export const BoardScore = ({ scores }) => {
+
+export const BoardScore = ({ scores, user }) => {
 
     if (typeof scores === 'undefined') {
         return null
@@ -6,11 +7,19 @@ export const BoardScore = ({ scores }) => {
         return null
     }
 
+    if(!scores){
+        return (
+            <div className="bg-danger boardScore">
+                <p>No hay ningun registro que mostrar</p>
+            </div>
+        )
+    }
+    
     return (
         <>
             <div className="bg-danger boardScore">
                 <ol>
-                    {scores.sort((a, b) => b.score - a.score).map(score => <li key={score.id}>{`${score.user.username}: ${score.score}`}</li>)}
+                    {scores.sort((a, b) => b.score - a.score).map(score => <li key={score.id} className={user.username === score.user.username ? 'text-warning' : ''} >{`${score.user.username}: ${score.score}`}</li>)}
                 </ol>
             </div>
         </>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:2000/api/scores';
+const baseUrl = '/api/scores';
 let tokenFormat = null;
 
 const setFormatToken = (tokenWithoutFormat) => {

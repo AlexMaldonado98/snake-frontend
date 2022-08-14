@@ -50,7 +50,8 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
             estados.contexto = estados.canvas.getContext('2d');
             console.log('me ejecute');
 
-
+            estados.presa = randomXY();
+            
             window.onkeydown = function (e) {
                 const direction = teclas[e.key];
                 if (direction) {
@@ -63,6 +64,7 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
             }
             tick();
         }()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -145,8 +147,6 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
         const { x, y } = estados.presa;
         drawPixel('yellow', x, y);
     }
-
-    estados.presa = randomXY();
 
     const handleScore = (puntajeLastGame) => {
 
@@ -240,7 +240,7 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
     return (
         <div>
             <canvas ref={canvasRef} className="canvas mb-4" width="250px" height="250px"></canvas>
-            <div className="container-fluid bg-success">
+            <div className="container-fluid">
                 <div className="row alingButtons my-4">
                     <div className="col-4"><button onClick={() => buttonW()}>W</button></div>
                 </div>

@@ -1,46 +1,50 @@
 import { useRef, useEffect, useState } from "react";
 
+const state_running = 1;
+const state_losing = 2;
+const state_pause= 3;
+const hz = 70;
+const tamano_cuadro = 10;
+const borde_ancho = 25;
+const borde_alto = 25;
+const crecimiento_escala = 5;
+const teclas = {
+    'A': [-1, 0],
+    'D': [1, 0],
+    'W': [0, -1],
+    'S': [0, 1],
+    'a': [-1, 0],
+    'd': [1, 0],
+    'w': [0, -1],
+    's': [0, 1]
+};
 
+let estados = {
+    canvas: null,
+    contexto: null,
+    snake: [{ x: 0, y: 0 }],
+    direccion: { x: 1, y: 0 },
+    presa: { x: 0, y: 0 },
+    growing: 5,
+    puntaje: 0,
+    puntajeLastgame: 0,
+    estadoJuego: state_running
+}
+let timer;
 export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
+    console.log('render snake');
 
     let [score, setScore] = useState(0);
+    const [state,setState] = useState(false);
 
+    const canvasRef = useRef(null);
+    
     const signOut = () => {
         handleSignOut();
-        clearInterval(timer + 2);
+        clearInterval();
     };
-
-    let timer;
-    const canvasRef = useRef(null);
-    const state_running = 1;
-    const state_losing = 2;
-    const hz = 70;
-    const tamano_cuadro = 10;
-    const borde_ancho = 25;
-    const borde_alto = 25;
-    const crecimiento_escala = 5;
-    const teclas = {
-        'A': [-1, 0],
-        'D': [1, 0],
-        'W': [0, -1],
-        'S': [0, 1],
-        'a': [-1, 0],
-        'd': [1, 0],
-        'w': [0, -1],
-        's': [0, 1]
-    };
-    let estados = {
-        canvas: null,
-        contexto: null,
-        snake: [{ x: 0, y: 0 }],
-        direccion: { x: 1, y: 0 },
-        presa: { x: 0, y: 0 },
-        growing: 5,
-        puntaje: 0,
-        puntajeLastgame: 0,
-        estadoJuego: state_running
-    }
     useEffect(() => {
+
         window.onload = function () {
             estados.canvas = canvasRef.current;
             estados.contexto = estados.canvas.getContext('2d');
@@ -57,7 +61,7 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
                     }
                 }
             }
-            /* tick(); */
+            tick();
         }()
     }, [])
 
@@ -145,12 +149,16 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
     estados.presa = randomXY();
 
     const handleScore = (puntajeLastGame) => {
+
         handleAddNewScore(puntajeLastGame);
         setScore(0);
         estados.puntaje = 0
     };
 
     const tick = () => {
+        if(estados.estadoJuego === 3){
+            return null
+        }
         const cabeza = estados.snake[0];
         const dx = estados.direccion.x;
         const dy = estados.direccion.y;
@@ -221,6 +229,14 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
         }, intervalo);
     }
 
+    useEffect(() => {
+        if(state){
+            estados.estadoJuego = state_pause;
+        }else{
+            estados.estadoJuego = state_running;
+        }
+    },[state]);
+
     return (
         <div>
             <canvas ref={canvasRef} className="canvas mb-4" width="250px" height="250px"></canvas>
@@ -240,8 +256,9 @@ export const GameSnake = ({ handleSignOut, handleAddNewScore, scores }) => {
                     </div>
                 </div>
             </div>
-            <div className="mt-2">
-                <button onClick={signOut} >SIGN OUT</button>
+            <div className="mt-2 d-flex justify-content-center">
+                <button onClick={signOut} className='bg-danger f1-5' >SIGN OUT</button>
+                <button onClick={() => setState(!state)} >{state ? 'Play' : 'Pause'}</button>
             </div>
             <div className="score">
                 <p>{`Score: ${score}`}</p>

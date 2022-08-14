@@ -38,9 +38,7 @@ function App() {
       scoreServices.setFormatToken(result.token);
       setUser(result);
       window.localStorage.setItem('loginUser', JSON.stringify(result));
-      console.log(result);
       setMessage('login success')
-      console.log('login', scores);
       setTimeout(() => {
         setMessage(null);
       }, 3000);
@@ -71,16 +69,14 @@ function App() {
   const handleSignOut = () => {
     window.localStorage.removeItem('loginUser')
     setUser(null);
+    window.location.reload();
   };
-  console.log('fuera de todo', scores);
 
   const handleAddNewScore = async (score) => {
     const scoresInDB = await scoreServices.getScore();
-    console.log('dentro', scores);
     const { id, username } = jwt(user.token)
     let scoreOfUser = scoresInDB.find(score => (score.user.id === id));
 
-    console.log(scoreOfUser);
     if (scoreOfUser) {
       if (score > scoreOfUser.score) {
         const result = await scoreServices.putScore(scoreOfUser.id, score)
